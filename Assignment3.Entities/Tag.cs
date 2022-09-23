@@ -13,6 +13,6 @@ public class Tag
     //Name : string(50), required, unique
     public string Name { get; set; } = null!;
     //Tasks : many-to-many reference to Task entity
-    public ICollection<Task> Tasks { get; set; }
+    public virtual List<Task> Tasks { get; set; }
 
 }

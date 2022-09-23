@@ -22,7 +22,7 @@ public class Task
     public string? Description { get; set; }
     
     //Tags : many-to-many reference to Tag entity
-    public ICollection<Tag> Tags { get; set; }
+    public virtual List<Tag> Tags { get; set; }
     
     public StateType State { get; set; }
     

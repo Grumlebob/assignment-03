@@ -23,11 +23,10 @@ public class KanbanContext : DbContext
             entity.Property(e => e.Name).HasMaxLength(50).IsRequired();
             
             //Tasks : many-to-many reference to Task entity
-            /*
             entity.HasMany(e => e.Tasks)
                 .WithMany(e => e.Tags)
                 .UsingEntity(e => e.ToTable("TaskTags"));
-                */
+                
         });
         
         modelBuilder.Entity<Task>(entity =>
@@ -36,7 +35,7 @@ public class KanbanContext : DbContext
             entity.Property(e => e.Title).HasMaxLength(100).IsRequired();
             //Description : string(max), optional
             entity.Property(e => e.Description).HasMaxLength(Int32.MaxValue);
-            /*
+
             //State : enum (New, Active, Resolved, Closed, Removed), required
             entity.Property(e => e.State)
                 .IsRequired()
@@ -44,23 +43,20 @@ public class KanbanContext : DbContext
                     v => v.ToString(),
                     v => (Task.StateType)Enum.Parse(typeof(Task.StateType), v));
             //Tags : many-to-many reference to Tag entity
+            
             entity.HasMany(e => e.Tags)
                 .WithMany(e => e.Tasks)
                 .UsingEntity(e => e.ToTable("TaskTags"));
             
             //Tasks : list of Task entities belonging to User
-            
             entity.HasOne(e => e.AssignedTo)
                 .WithMany(d => d.Tasks)
                 .HasForeignKey(e => e.Id);
-                */
-
         });
        
         modelBuilder.Entity<User>(entity =>
         {
             entity.Property(e => e.Name).HasMaxLength(100).IsRequired();
-
         });
         
 
