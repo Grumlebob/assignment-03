@@ -20,5 +20,5 @@ Tasks : list of Task entities belonging to User
     public string Name { get; set; }
     [Required, MaxLength(100)]
     public string Email { get; set; }
-    public ICollection<Task> Tasks { get; set; }
+    public List<Task> Tasks { get; set; }
 }

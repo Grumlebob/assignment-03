@@ -12,7 +12,7 @@ public class Tag
     public int Id { get; set; }
     //Name : string(50), required, unique
     [Required, MaxLength(50)]
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
     //Tasks : many-to-many reference to Task entity
     public ICollection<Tag> Tags { get; set; }
 
