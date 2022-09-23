@@ -13,14 +13,12 @@ public class Task
     public int Id { get; set; }
     
     //Title : string(100), required
-    [Required, MaxLength(100)]
     public string Title { get; set; }
     
     //AssignedTo : optional reference to User entity
     public User? AssignedTo { get; set; }
     
     //Description : string(max), optional
-    [MaxLength(Int32.MaxValue)]
     public string? Description { get; set; }
     
     //Tags : many-to-many reference to Tag entity

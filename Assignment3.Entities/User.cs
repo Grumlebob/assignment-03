@@ -16,9 +16,7 @@ Tasks : list of Task entities belonging to User
     }
 
     public int Id { get; set; }
-    [Required, MaxLength(100)]
     public string Name { get; set; }
-    [Required, MaxLength(100)]
     public string Email { get; set; }
     public List<Task> Tasks { get; set; }
 }
