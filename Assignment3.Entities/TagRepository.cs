@@ -4,6 +4,12 @@ namespace Assignment3.Entities;
 
 public class TagRepository : ITagRepository
 {
+    private readonly KanbanContext context;
+    
+    public TagRepository(KanbanContext context)
+    {
+        this.context = context;
+    }
     public (Response Response, int TagId) Create(TagCreateDTO tag)
     {
         throw new NotImplementedException();

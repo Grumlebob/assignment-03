@@ -5,7 +5,12 @@ namespace Assignment3.Entities;
 public class TaskRepository : ITaskRepository
 {
     
-    private readonly KanbanContext _context;
+    private readonly KanbanContext context;
+    
+    public TaskRepository(KanbanContext context)
+    {
+        this.context = context;
+    }
     
     public (Response Response, int TaskId) Create(TaskCreateDTO task)
     {

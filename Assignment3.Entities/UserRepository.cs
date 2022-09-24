@@ -5,11 +5,26 @@ namespace Assignment3.Entities;
 public class UserRepository : IUserRepository
 {
     
-    private readonly KanbanContext _context;
+    private readonly KanbanContext context;
+    
+    public UserRepository(KanbanContext context)
+    {
+        this.context = context;
+    }
 
     public (Response Response, int UserId) Create(UserCreateDTO user)
     {
-        throw new NotImplementedException();
+        //Bare test eksempel uden at have fulgt opgave kravene.
+        var response = Response.Created;
+        
+        var newUser =  new User{
+            Email = user.Email,
+            Name = user.Name,
+        };
+        
+        context.Users.Add(newUser);
+        context.SaveChanges();
+        return (response, newUser.Id);
     }
 
     public IReadOnlyCollection<UserDTO> ReadAll()
