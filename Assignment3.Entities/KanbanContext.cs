@@ -15,6 +15,8 @@ public class KanbanContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
 
+        var dog = new Dog("bob");
+        
         modelBuilder.UseIdentityColumns();
         
         modelBuilder.Entity<Tag>(entity =>
@@ -42,16 +44,6 @@ public class KanbanContext : DbContext
                 .HasConversion(
                     v => v.ToString(),
                     v => (Task.StateType)Enum.Parse(typeof(Task.StateType), v));
-            //Tags : many-to-many reference to Tag entity
-            
-            entity.HasMany(e => e.Tags)
-                .WithMany(e => e.Tasks)
-                .UsingEntity(e => e.ToTable("TaskTags"));
-            
-            //Tasks : list of Task entities belonging to User
-            entity.HasOne(e => e.AssignedTo)
-                .WithMany(d => d.Tasks)
-                .HasForeignKey(e => e.Id);
         });
        
         modelBuilder.Entity<User>(entity =>
