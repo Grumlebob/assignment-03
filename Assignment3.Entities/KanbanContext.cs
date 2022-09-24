@@ -14,8 +14,6 @@ public class KanbanContext : DbContext
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-
-        var dog = new Dog("bob");
         
         modelBuilder.UseIdentityColumns();
         
