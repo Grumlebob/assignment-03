@@ -12,7 +12,16 @@ public class TagRepository : ITagRepository
     }
     public (Response Response, int TagId) Create(TagCreateDTO tag)
     {
-        throw new NotImplementedException();
+        //Bare test eksempel uden at have fulgt opgave kravene.
+        var response = Response.Created;
+        
+        var newTag =  new Tag{
+            Name = tag.Name,
+        };
+        
+        context.Tags.Add(newTag);
+        context.SaveChanges();
+        return (response, newTag.Id);
     }
 
     public IReadOnlyCollection<TagDTO> ReadAll()
