@@ -4,14 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Task = Assignment3.Entities.Task;
 
-var configuration = new ConfigurationBuilder()
-    .AddUserSecrets<Program>()
-    .Build();
-var connectionString = configuration.GetConnectionString("ConnectionString");
-var optionsBuilder = new DbContextOptionsBuilder<KanbanContext>();
-optionsBuilder.UseNpgsql(connectionString);
-var options = optionsBuilder.Options;
-using var context = new KanbanContext(options);
+var factory = new KanbanContextFactory();
+using var context = factory.CreateDbContext(args);
 
 
 var tagRepository = new TagRepository(context);
