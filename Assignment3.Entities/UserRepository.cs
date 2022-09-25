@@ -23,7 +23,14 @@ public class UserRepository : IUserRepository
         };
         
         context.Users.Add(newUser);
+        try
+        {
         context.SaveChanges();
+        } catch (Exception e)
+        {
+            response = Response.Conflict;
+        }
+        
         return (response, newUser.Id);
     }
 
