@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using Assignment3.Core;
+
 namespace Assignment3.Entities;
 
 public class Task
@@ -26,16 +28,9 @@ public class Task
     //Tags : many-to-many reference to Tag entity
     public virtual List<Tag> Tags { get; set; }
     
-    public StateType State { get; set; }
+    public State State { get; set; }
     
     //State : enum (New, Active, Resolved, Closed, Removed), required
-    public enum StateType
-    {
-        New,
-        Active,
-        Resolved,
-        Closed,
-        Removed
-    }
+    
     
 }

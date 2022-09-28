@@ -1,3 +1,4 @@
+using Assignment3.Core;
 using Microsoft.EntityFrameworkCore;
 
 namespace Assignment3.Entities;
@@ -41,7 +42,7 @@ public class KanbanContext : DbContext
                 .IsRequired()
                 .HasConversion(
                     v => v.ToString(),
-                    v => (Task.StateType)Enum.Parse(typeof(Task.StateType), v));
+                    v => (State)Enum.Parse(typeof(State), v));
         });
        
         modelBuilder.Entity<User>(entity =>
