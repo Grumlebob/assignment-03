@@ -46,11 +46,30 @@ public class UserRepository : IUserRepository
 
     public Response Update(UserUpdateDTO user)
     {
-        throw new NotImplementedException();
+        try{
+            var newUser = context.Users.Where(u => u.Id == user.Id).First();
+            newUser.Email = user.Email;
+            newUser.Name = user.Name;
+            context.Users.Update(newUser);
+            context.SaveChanges();
+            return Response.Updated; 
+        }
+        catch{
+            return Response.NotFound;
+        }
     }
 
     public Response Delete(int userId, bool force = false)
     {
-        throw new NotImplementedException();
+        if(!force) return Response.Conflict;
+        try{
+            var newUser = context.Users.Where(u => u.Id == userId).First();
+            context.Users.Remove(newUser);
+            context.SaveChanges();
+            return Response.Deleted; 
+        }
+        catch{
+            return Response.NotFound;
+        }
     }
 }
