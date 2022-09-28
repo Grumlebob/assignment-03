@@ -23,7 +23,7 @@ public class TaskRepository : ITaskRepository
             newtask.Description = task.Description;
             newtask.UserID = task.AssignedToId;
             newtask.Title = task.Title;
-            newtask.State = Task.StateType.New;
+            newtask.State = State.New;
             context.Tasks.Add(newtask);
             context.SaveChanges();
         }
