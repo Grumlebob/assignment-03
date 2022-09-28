@@ -12,17 +12,20 @@ public class TagRepository : ITagRepository
     }
     public (Response Response, int TagId) Create(TagCreateDTO tag)
     {
-        //Bare test eksempel uden at have fulgt opgave kravene.
         var response = Response.Created;
-
-        var newTag = new Tag
+        var nTag = new Tag();
+        try
         {
-            Name = tag.Name,
-        };
-
-        context.Tags.Add(newTag);
-        context.SaveChanges();
-        return (response, newTag.Id);
+            nTag.Name = tag.Name;
+            context.Tags.Add(nTag);
+            context.SaveChanges();
+        }
+        catch (Exception e)
+        {
+            response = Response.Conflict;
+        }
+        
+        return (response, nTag.Id);
     }
 
     public IReadOnlyCollection<TagDTO> ReadAll()

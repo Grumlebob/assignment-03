@@ -89,15 +89,15 @@ public class TaskRepository : ITaskRepository
         try
         {
             var newTask = context.Tasks.Where(t => t.Id == taskId).FirstOrDefault();
-            if (newTask!.State == Task.StateType.New)
+            if (newTask!.State == State.New)
             {
                 context.Remove(newTask!);
                 context.SaveChanges();
                 return Response.Deleted;
             }
-            else if (newTask!.State == Task.StateType.Active)
+            else if (newTask!.State == State.Active)
             {
-                newTask.State = Task.StateType.Removed;
+                newTask.State = State.Removed;
                 return Response.Conflict;
             }
             else return Response.Conflict;
