@@ -1,4 +1,5 @@
-﻿using Assignment3.Core;
+﻿using System.Net;
+using Assignment3.Core;
 
 namespace Assignment3.Entities;
 
@@ -14,7 +15,25 @@ public class TaskRepository : ITaskRepository
 
     public (Response Response, int TaskId) Create(TaskCreateDTO task)
     {
-        throw new NotImplementedException();
+        var response = Response.Created;
+        var newtask = new Task();
+        try
+        {
+            
+            newtask.Description = task.Description;
+            newtask.UserID = task.AssignedToId;
+            newtask.Title = task.Title;
+            newtask.State = Task.StateType.New;
+            context.Tasks.Add(newtask);
+            context.SaveChanges();
+        }
+        catch
+        {
+            response = Response.Conflict;
+        }
+
+        return (response, newtask.Id);
+
     }
 
     public IReadOnlyCollection<TaskDTO> ReadAll()

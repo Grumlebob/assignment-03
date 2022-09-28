@@ -348,3 +348,9 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+Assignment3.Entities/Migrations/KanbanContextModelSnapshot.cs
+Assignment3.Entities/Migrations/20220928131759_Initial.Designer.cs
+Assignment3.Entities/Migrations/20220928131759_Initial.cs
+.idea/.idea.assignment-03/.idea/workspace.xml
+.idea/.idea.assignment-03/.idea/indexLayout.xml
+.idea/.idea.assignment-03/.idea/efCoreCommonOptions.xml
