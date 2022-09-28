@@ -4,17 +4,17 @@ namespace Assignment3.Entities;
 
 public class TaskRepository : ITaskRepository
 {
-    
+
     private readonly KanbanContext context;
-    
+
     public TaskRepository(KanbanContext context)
     {
         this.context = context;
     }
-    
+
     public (Response Response, int TaskId) Create(TaskCreateDTO task)
     {
-        throw new NotImplementedException();
+        
     }
 
     public IReadOnlyCollection<TaskDTO> ReadAll()
@@ -49,11 +49,41 @@ public class TaskRepository : ITaskRepository
 
     public Response Update(TaskUpdateDTO task)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var newTask = context.Tasks.Where(t => t.Id == task.Id).First();
+            newTask.Description = task.Description;
+            newTask.Title = task.Title;
+            newTask.UserID = task.AssignedToId;
+            context.Tasks.Update(newTask);
+            context.SaveChanges();
+            return Response.Updated;
+        }
+        catch
+        {
+            return Response.NotFound;
+        }
     }
 
     public Response Delete(int taskId)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var newTask = context.Tasks.Where(t => t.Id == taskId).FirstOrDefault();
+            if (newTask!.State == Task.StateType.New)
+            {
+                context.Remove(newTask!);
+                context.SaveChanges();
+                return Response.Deleted;
+            }else if(newTask!.State == Task.StateType.Active){
+                newTask.State = Task.StateType.Removed;
+                return Response.Conflict;
+            }else return Response.Conflict;
+
+        }
+        catch
+        {
+            return Response.NotFound;
+        }
     }
 }
