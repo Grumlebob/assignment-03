@@ -46,7 +46,22 @@ public sealed class TagRepositoryTests : IDisposable
 
         actual.Should().Be(Response.Updated);
     }
+    [Fact]
+    public void delete_without_force_returns_conflict(){
+        _repository.Create(new TagCreateDTO(Name: "bob"));
 
+        var actual = _repository.Delete(1, false);
+
+        actual.Should().Be(Response.Conflict);
+    }
+    [Fact]
+    public void delete_with_force_deletes(){
+        _repository.Create(new TagCreateDTO(Name: "bob"));
+
+        var actual = _repository.Delete(1, true);
+
+        actual.Should().Be(Response.Deleted);
+    }
     public void Dispose()
     {
         _context.Dispose();
