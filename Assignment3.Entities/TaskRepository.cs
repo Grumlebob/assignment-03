@@ -14,7 +14,7 @@ public class TaskRepository : ITaskRepository
 
     public (Response Response, int TaskId) Create(TaskCreateDTO task)
     {
-        
+        throw new NotImplementedException();
     }
 
     public IReadOnlyCollection<TaskDTO> ReadAll()
@@ -75,10 +75,13 @@ public class TaskRepository : ITaskRepository
                 context.Remove(newTask!);
                 context.SaveChanges();
                 return Response.Deleted;
-            }else if(newTask!.State == Task.StateType.Active){
+            }
+            else if (newTask!.State == Task.StateType.Active)
+            {
                 newTask.State = Task.StateType.Removed;
                 return Response.Conflict;
-            }else return Response.Conflict;
+            }
+            else return Response.Conflict;
 
         }
         catch
