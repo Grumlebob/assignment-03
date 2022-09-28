@@ -4,9 +4,9 @@ namespace Assignment3.Entities;
 
 public class UserRepository : IUserRepository
 {
-    
+
     private readonly KanbanContext context;
-    
+
     public UserRepository(KanbanContext context)
     {
         this.context = context;
@@ -14,24 +14,18 @@ public class UserRepository : IUserRepository
 
     public (Response Response, int UserId) Create(UserCreateDTO user)
     {
-        //Bare test eksempel uden at have fulgt opgave kravene.
-        var response = Response.Created;
-        
-        var newUser =  new User{
-            Email = user.Email,
-            Name = user.Name,
-        };
-        
-        context.Users.Add(newUser);
-        try
+        if (context.Users.Find(user.Email) != null) return (Response.Conflict, 00);
+        else
         {
-        context.SaveChanges();
-        } catch (Exception e)
-        {
-            response = Response.Conflict;
+            var newUser = new User
+            {
+                Email = user.Email,
+                Name = user.Name,
+            };
+            context.Users.Add(newUser);
+            context.SaveChanges();
+            return (Response.Created, newUser.Id);
         }
-        
-        return (response, newUser.Id);
     }
 
     public IReadOnlyCollection<UserDTO> ReadAll()
@@ -46,30 +40,35 @@ public class UserRepository : IUserRepository
 
     public Response Update(UserUpdateDTO user)
     {
-        try{
+        try
+        {
             var newUser = context.Users.Where(u => u.Id == user.Id).First();
             newUser.Email = user.Email;
             newUser.Name = user.Name;
             context.Users.Update(newUser);
             context.SaveChanges();
-            return Response.Updated; 
+            return Response.Updated;
         }
-        catch{
+        catch
+        {
             return Response.NotFound;
         }
     }
 
     public Response Delete(int userId, bool force = false)
     {
-        if(!force) return Response.Conflict;
+        if (context.Users.Find(userId)!.Tasks != null && !force) return Response.Conflict;
+        else{
         try{
             var newUser = context.Users.Where(u => u.Id == userId).First();
             context.Users.Remove(newUser);
             context.SaveChanges();
-            return Response.Deleted; 
+            return Response.Deleted;
         }
-        catch{
+        catch
+        {
             return Response.NotFound;
+        }
         }
     }
 }

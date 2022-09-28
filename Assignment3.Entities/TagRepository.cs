@@ -12,20 +12,18 @@ public class TagRepository : ITagRepository
     }
     public (Response Response, int TagId) Create(TagCreateDTO tag)
     {
-        var response = Response.Created;
-        var nTag = new Tag();
-        try
+
+        var newTag = new Tag
         {
-            nTag.Name = tag.Name;
-            context.Tags.Add(nTag);
+            Name = tag.Name,
+        };
+        if (context.Tags.Find(newTag.Name) != null) return (Response.Conflict, newTag.Id);
+        else
+        {
+            context.Tags.Add(newTag);
             context.SaveChanges();
+            return (Response.Created, newTag.Id);
         }
-        catch (Exception e)
-        {
-            response = Response.Conflict;
-        }
-        
-        return (response, nTag.Id);
     }
 
     public IReadOnlyCollection<TagDTO> ReadAll()
@@ -56,13 +54,16 @@ public class TagRepository : ITagRepository
 
     public Response Delete(int tagId, bool force = false)
     {
-        if(!force) return Response.Conflict;
         try
         {
-            var newTag = context.Tags.Where(t => t.Id == tagId).First();
-            context.Remove(newTag);
-            context.SaveChanges();
-            return Response.Deleted;
+            if (context.Tags.Find(tagId)!.Tasks != null && !force) return Response.Conflict;
+            else
+            {
+                var newTag = context.Tags.Where(t => t.Id == tagId).First();
+                context.Remove(newTag);
+                context.SaveChanges();
+                return Response.Deleted;
+            }
         }
         catch
         {

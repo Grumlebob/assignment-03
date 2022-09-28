@@ -30,6 +30,7 @@ public class Task
     
     public State State { get; set; }
     
+    public DateTime StateUpdated { get; set;}
     //State : enum (New, Active, Resolved, Closed, Removed), required
     
     

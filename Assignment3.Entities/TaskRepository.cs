@@ -19,7 +19,7 @@ public class TaskRepository : ITaskRepository
         var newtask = new Task();
         try
         {
-            
+
             newtask.Description = task.Description;
             newtask.UserID = task.AssignedToId;
             newtask.Title = task.Title;
@@ -71,12 +71,27 @@ public class TaskRepository : ITaskRepository
         try
         {
             var newTask = context.Tasks.Where(t => t.Id == task.Id).First();
+            if (newTask.State != task.State)
+            {
+                newTask.State = task.State;
+                newTask.StateUpdated = DateTime.Now;
+            }
             newTask.Description = task.Description;
             newTask.Title = task.Title;
-            newTask.UserID = task.AssignedToId;
-            context.Tasks.Update(newTask);
-            context.SaveChanges();
-            return Response.Updated;
+            if (context.Users.Find(task.AssignedToId) == null) return Response.BadRequest;
+            else
+            {
+                try{
+                    newTask.Tags = (List<Tag>)task.Tags;
+                }
+                catch{
+                    return Response.Conflict;
+                }
+                newTask.UserID = task.AssignedToId;
+                context.Tasks.Update(newTask);
+                context.SaveChanges();
+                return Response.Updated;
+            }
         }
         catch
         {
