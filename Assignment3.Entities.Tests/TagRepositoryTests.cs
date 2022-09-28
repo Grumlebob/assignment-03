@@ -36,7 +36,16 @@ public sealed class TagRepositoryTests : IDisposable
         Assert.Equal(1, _context.Tags.First().Id);
         //comment
     }
+    [Fact]
+    public void update_returns_update_or_notFound(){
+        _repository.Create(new TagCreateDTO(Name: "Bob"));
+        
 
+        var tudto = new TagUpdateDTO(1, "tested");
+        var actual =_repository.Update(tudto); 
+
+        actual.Should().Be(Response.Updated);
+    }
 
     public void Dispose()
     {
