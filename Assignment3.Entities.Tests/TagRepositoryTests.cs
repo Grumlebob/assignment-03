@@ -1,3 +1,4 @@
+using Assignment3.Core;
 using Microsoft.Data.Sqlite;
 
 namespace Assignment3.Entities.Tests;
@@ -22,7 +23,17 @@ public sealed class TagRepositoryTests : IDisposable
         context.SaveChanges();
 
         _context = context;
-        //_repository = new CityRepository(_context);
+        _repository = new TagRepository(_context);
+    }
+    
+    [Fact]
+    public void CreateTag()
+    {
+        var (response, city) = _repository.Create(new TagCreateDTO(Name: "Bob"));
+        
+        Assert.Equal(1, _context.Tags.Count());
+        Assert.Equal("Bob", _context.Tags.First().Name);
+        Assert.Equal(1, _context.Tags.First().Id);
     }
 
 
