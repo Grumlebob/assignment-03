@@ -21,9 +21,6 @@ public class TaskRepository : ITaskRepository
         {            
             if (context.Users.Find(task.AssignedToId) == null) return (Response.BadRequest, 0);
             else{
-
-            
-
             newtask.Description = task.Description;
             newtask.UserID = task.AssignedToId;
             newtask.Title = task.Title;
