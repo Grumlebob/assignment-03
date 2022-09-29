@@ -38,7 +38,7 @@ public sealed class TagRepositoryTests : IDisposable
     }
     [Fact]
     public void update_returns_update_or_notFound(){
-        _repository.Create(new TagCreateDTO(Name: "Bob"));
+        _repository.Create(new TagCreateDTO(Name: "bob"));
         
 
         var tudto = new TagUpdateDTO(1, "tested");
@@ -56,7 +56,8 @@ public sealed class TagRepositoryTests : IDisposable
     }
     [Fact]
     public void delete_with_force_deletes(){
-        _repository.Create(new TagCreateDTO(Name: "bob"));
+        var temp = new TagCreateDTO(Name: "To do list");
+        _repository.Create(temp);
 
         var actual = _repository.Delete(1, true);
 
