@@ -14,19 +14,23 @@ public class UserRepository : IUserRepository
 
     public (Response Response, int UserId) Create(UserCreateDTO user)
     {
-        if (context.Users.Find(user.Email) != null) return (Response.Conflict, 00);
-        else
-        {
-            var newUser = new User
-            {
-                Email = user.Email,
-                Name = user.Name,
-            };
+        var newUser = new User();
+        newUser.Name = user.Name;
+        var id = 0;
+        try{
+            id = context.Users.Where(x => x.Email == user.Email).First().Id;
+        }catch{
+
+        }
+            if(context.Users.Find(id) != null) return (Response.Conflict, 00);
+            else{
+                newUser.Email = user.Email;
+            }
             context.Users.Add(newUser);
             context.SaveChanges();
             return (Response.Created, newUser.Id);
         }
-    }
+    
 
     public IReadOnlyCollection<UserDTO> ReadAll()
     {
