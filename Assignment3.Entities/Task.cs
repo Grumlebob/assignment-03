@@ -15,7 +15,7 @@ public class Task
     public int Id { get; set; }
     
     //Title : string(100), required
-    public string Title { get; set; }
+    public string? Title { get; set; }
     
     //Description : string(max), optional
     public string? Description { get; set; }

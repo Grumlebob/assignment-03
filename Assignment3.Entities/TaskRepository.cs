@@ -24,6 +24,7 @@ public class TaskRepository : ITaskRepository
             newtask.UserID = task.AssignedToId;
             newtask.Title = task.Title;
             newtask.State = State.New;
+            newtask.StateUpdated = DateTime.Now;
             context.Tasks.Add(newtask);
             context.SaveChanges();
         }
@@ -76,17 +77,13 @@ public class TaskRepository : ITaskRepository
                 newTask.State = task.State;
                 newTask.StateUpdated = DateTime.Now;
             }
-            newTask.Description = task.Description;
-            newTask.Title = task.Title;
             if (context.Users.Find(task.AssignedToId) == null) return Response.BadRequest;
             else
             {
-                try{
-                    newTask.Tags = (List<Tag>)task.Tags;
-                }
-                catch{
-                    return Response.Conflict;
-                }
+                if (task.Tags != null) newTask.Tags = (List<Tag>)task.Tags;
+
+                newTask.Description = task.Description;
+                newTask.Title = task.Title;
                 newTask.UserID = task.AssignedToId;
                 context.Tasks.Update(newTask);
                 context.SaveChanges();

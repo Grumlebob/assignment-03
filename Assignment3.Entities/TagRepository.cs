@@ -13,17 +13,23 @@ public class TagRepository : ITagRepository
     public (Response Response, int TagId) Create(TagCreateDTO tag)
     {
 
-        var newTag = new Tag
-        {
-            Name = tag.Name,
-        };
-        if (context.Tags.Find(newTag.Name) != null) return (Response.Conflict, newTag.Id);
-        else
-        {
+        var newTag = new Tag();
+        
+        
+            newTag.Name = tag.Name;
+            var id = 0;
+            try{    
+            id = context.Tags.Where(x => x.Name == tag.Name).First().Id;
+            }catch
+            {
+
+            }
+            if (context.Tags.Find(id) != null) return (Response.Conflict, newTag.Id);
+            else{
             context.Tags.Add(newTag);
             context.SaveChanges();
             return (Response.Created, newTag.Id);
-        }
+            }
     }
 
     public IReadOnlyCollection<TagDTO> ReadAll()
