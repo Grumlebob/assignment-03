@@ -23,8 +23,9 @@ public sealed class TaskRepositoryTests : IDisposable
         _repository = new TaskRepository(_context);
     }
     [Fact]
-    public void delete_active_resolved_closed_removed_returns_conflict() //not working, gets notFound, should get conflicts.
+    public void delete_active_resolved_closed_removed_returns_conflict()
     {
+        _context.Users.AddRange(new User() { Id = 1 , Name = "test", Email = "test@mail.dk" });
         var task = new TaskCreateDTO(Title: "test", AssignedToId: 1, Description: "testing", Tags: null!);
         var taskTwo = new TaskCreateDTO(Title: "testTwo", AssignedToId: 1, Description: "testing", Tags: null!);
         var taskThree = new TaskCreateDTO(Title: "testThree", AssignedToId: 1, Description: "testing", Tags: null!);
@@ -51,28 +52,28 @@ public sealed class TaskRepositoryTests : IDisposable
         actualFour.Should().Be(Response.Conflict);
     }
     [Fact]
-    public void create_sets_stateupdated_to_now(){ //not working actual is null?
+    public void create_sets_stateupdated_to_now(){
+        _context.Users.AddRange(new User() { Id = 1, Name = "test", Email = "test@mail.dk" });
         var (reponse, id) = _repository.Create(new TaskCreateDTO(Title: "test", AssignedToId: 1, Description: "testing", Tags: null!));
         var actual = _context.Tasks.Find(id)!.StateUpdated.AddSeconds(2);
 
-        var expected = DateTime.UtcNow;
-        
+        var expected = DateTime.Now;
 
         actual.Should().BeCloseTo(expected, precision: TimeSpan.FromSeconds(5));
     }
     [Fact]
-    public void update_sets_stateupdated_to_now(){  //not working, actual is null?
+    public void update_sets_stateupdated_to_now(){
+        _context.Users.AddRange(new User() { Id = 1, Name = "test", Email = "test@mail.dk" });
         _repository.Create(new TaskCreateDTO(Title: "test", AssignedToId: 1, Description: "testing", Tags: null!));
         _repository.Update(new TaskUpdateDTO(Id: 1, Title: "test", AssignedToId: 1, Description: "testing", Tags: null!, State: State.Active));
-        var actual = _context.Tasks.Find(1).StateUpdated.AddSeconds(2);
+        var actual = _context.Tasks.Find(1)!.StateUpdated.AddSeconds(2);
 
-        var expected = DateTime.UtcNow;
-        
+        var expected = DateTime.Now;
 
         actual.Should().BeCloseTo(expected, precision: TimeSpan.FromSeconds(5));
     }
     [Fact]
-    public void assigning_non_existing_user_returns_bad_request(){ //Working
+    public void assigning_non_existing_user_returns_bad_request(){
         var (actual, id) = _repository.Create(new TaskCreateDTO(Title: "test", AssignedToId: 1, Description: "testing", Tags: null!));
 
         actual.Should().Be(Response.BadRequest);
@@ -81,6 +82,5 @@ public sealed class TaskRepositoryTests : IDisposable
     {
         _context.Dispose();
     }
-    
 }
 
