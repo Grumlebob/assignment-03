@@ -34,7 +34,7 @@ Select: ");
         Console.Write("Enter Name: ");
         var inputName = Console.ReadLine();
         
-        TagCreateDTO createTag = new TagCreateDTO(Name: inputName);
+        TagCreateDTO createTag = new TagCreateDTO(Name: inputName!);
         var (response, userId) = tagRepository.Create(createTag);
 
         Console.WriteLine($"You attempted to create: {inputName} id: {userId} \nWith response: {response}");
@@ -86,7 +86,7 @@ Select: ");
         Console.Write("Enter Email: ");
         var inputEmail = Console.ReadLine();
 
-        UserCreateDTO userCreateDTO = new UserCreateDTO(Email: inputEmail, Name: inputName);
+        UserCreateDTO userCreateDTO = new UserCreateDTO(Email: inputEmail!, Name: inputName!);
         var (response, userId) = userRepository.Create(userCreateDTO);
 
         Console.WriteLine("You attempted to create: " + inputEmail + " " + inputName + " id: " + userId + " \n" +
