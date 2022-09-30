@@ -41,7 +41,14 @@ public class TaskRepository : ITaskRepository
 
     public IReadOnlyCollection<TaskDTO> ReadAll()
     {
-        throw new NotImplementedException();
+        //Forkert, da den læser tags forkert.
+        var all = new List<TaskDTO>(); 
+        foreach (var task in context.Tasks)
+        { 
+            all.Add(new TaskDTO(Id:task.Id, Title:task.Title, task.UserID.ToString(), Tags: new []{String.Empty, },State:task.State));
+        }
+
+        return all;
     }
 
     public IReadOnlyCollection<TaskDTO> ReadAllRemoved()
@@ -66,7 +73,21 @@ public class TaskRepository : ITaskRepository
 
     public TaskDetailsDTO Read(int taskId)
     {
-        throw new NotImplementedException();
+        var task = context.Tasks.Find(taskId);
+        if (task == null) return null;
+        else
+        { 
+            return new TaskDetailsDTO(
+                Id: task.Id,
+                Title: task.Title,
+                Description: task.Description,
+                Created: DateTime.Now,
+                AssignedToName: task.UserID.ToString(),
+                Tags: new[] { String.Empty, },
+                State: task.State,
+                StateUpdated: task.StateUpdated
+                );
+        }
     }
 
     public Response Update(TaskUpdateDTO task)
