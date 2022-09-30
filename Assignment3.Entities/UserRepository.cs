@@ -34,12 +34,18 @@ public class UserRepository : IUserRepository
 
     public IReadOnlyCollection<UserDTO> ReadAll()
     {
-        throw new NotImplementedException();
+        var all = new List<UserDTO>();
+        foreach (var tag in context.Users)
+        {
+            all.Add(new UserDTO(tag.Id, tag.Name, tag.Email));
+        }
+        return all;
     }
 
     public UserDTO Read(int userId)
     {
-        throw new NotImplementedException();
+        var u = context.Users.Find(userId);
+        return new UserDTO(u.Id, u.Name, u.Email);
     }
 
     public Response Update(UserUpdateDTO user)
