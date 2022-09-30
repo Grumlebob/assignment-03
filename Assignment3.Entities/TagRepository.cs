@@ -15,15 +15,15 @@ public class TagRepository : ITagRepository
 
         var newTag = new Tag();
         
-        
             newTag.Name = tag.Name;
             var id = 0;
             try{    
-            id = context.Tags.Where(x => x.Name == tag.Name).First().Id;
-            }catch
-            {
-
+            id = context.Tags.First(x => x.Name == tag.Name).Id;
             }
+            catch
+            {
+            }
+
             if (context.Tags.Find(id) != null) return (Response.Conflict, newTag.Id);
             else{
             context.Tags.Add(newTag);
@@ -34,12 +34,20 @@ public class TagRepository : ITagRepository
 
     public IReadOnlyCollection<TagDTO> ReadAll()
     {
-        throw new NotImplementedException();
+        var all = new List<TagDTO>();
+        foreach (var tag in context.Tags)
+        {
+            all.Add(new TagDTO(Id: tag.Id, Name: tag.Name));
+            
+        }
+        return all;
     }
 
     public TagDTO Read(int tagId)
     {
-        throw new NotImplementedException();
+         var tag = context.Tags.Find(tagId);
+            if (tag == null) return null;
+            return new TagDTO(tag.Id, tag.Name);
     }
 
     public Response Update(TagUpdateDTO tag)

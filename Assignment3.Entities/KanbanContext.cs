@@ -22,6 +22,7 @@ public class KanbanContext : DbContext
         {
             //Name : string(50), required, unique
             entity.Property(e => e.Name).HasMaxLength(50).IsRequired();
+            entity.HasIndex(e => e.Name).IsUnique();
             
             //Tasks : many-to-many reference to Task entity
             entity.HasMany(e => e.Tasks)
@@ -48,6 +49,7 @@ public class KanbanContext : DbContext
         modelBuilder.Entity<User>(entity =>
         {
             entity.Property(e => e.Name).HasMaxLength(100).IsRequired();
+            entity.HasIndex(e => e.Email).IsUnique();
         });
         
 
