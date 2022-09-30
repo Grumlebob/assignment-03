@@ -1,181 +1,147 @@
 ﻿using System.Net;
 using Assignment3.Core;
+using static Assignment3.Core.Response;
 
 namespace Assignment3.Entities;
 
 public class TaskRepository : ITaskRepository
 {
-
-    private readonly KanbanContext context;
+    private readonly KanbanContext _context;
 
     public TaskRepository(KanbanContext context)
     {
-        this.context = context;
+        _context = context;
     }
 
     public (Response Response, int TaskId) Create(TaskCreateDTO task)
     {
-        var response = Response.Created;
-        var newtask = new Task();
-        try
+        var entity = new Task()
         {
-            if (context.Users.Find(task.AssignedToId) == null) return (Response.BadRequest, 0);
-            else
-            {
-                newtask.Description = task.Description;
-                newtask.UserID = task.AssignedToId;
-                newtask.Title = task.Title;
-                newtask.State = State.New;
-                newtask.StateUpdated = DateTime.Now;
-                context.Tasks.Add(newtask);
-                context.SaveChanges();
-            }
-        }
-        catch
-        {
-            response = Response.Conflict;
-        }
+            Title = task.Title,
+            Description = task.Description,
+            AssignedTo = CreateOrUpdateUser(task.AssignedToId),
+            StateUpdated = DateTime.Now,
+            State = State.New,
+            Tags = CreateOrUpdateTags(task.Tags).ToList(),
+        };
 
-        return (response, newtask.Id);
+        _context.Tasks.Add(entity);
+        _context.SaveChanges();
 
+        var created = new TaskDetailsDTO(entity.Id, entity.Title, entity.Description, Created: DateTime.Now,
+            entity.AssignedTo.Name, Tags: entity.Tags.Select(t => t.Name).ToList(), entity.State, entity.StateUpdated);
+        return (Created, created.Id);
     }
 
     public TaskDetailsDTO Find(int taskId)
     {
-        foreach (var task in context.Tasks)
-        {
-            var tags = new List<String>();
-            foreach (var tag in task.Tags) tags.Add(tag.ToString()!);
-            if (task.Id == taskId)
-            {
-                return new TaskDetailsDTO(Id: task.Id, Title: task.Title!, Description: task.Description!, Created: task.StateUpdated, AssignedToName: (context.Users.Find(task.UserID)!.Name)!, Tags: tags, State: task.State, task.StateUpdated);
-            }
-        }return null!;
+        var Tasks = from c in _context.Tasks
+            let tags = c.Tags.Select(p => p.Name).ToList()
+            where c.Id == taskId
+            select new TaskDetailsDTO(c.Id, c.Title, c.Description, DateTime.Now, c.AssignedTo.Name, tags, c.State,
+                c.StateUpdated);
+
+        return Tasks.FirstOrDefault();
     }
-    
+
 
     public IReadOnlyCollection<TaskDTO> Read()
     {
-        var all = new List<TaskDTO>();
+        //(int Id, string Title, string AssignedToName, IReadOnlyCollection<string> Tags, State State);
+        var Tasks = from c in _context.Tasks
+            let tags = c.Tags.Select(p => p.Name).ToList()
+            select new TaskDTO(c.Id, c.Title, c.AssignedTo.Name, tags, c.State);
 
-        foreach (var task in context.Tasks)
-        {
-            var tags = new List<String>();
-            foreach (var tag in task.Tags) tags.Add(tag.ToString()!);
-
-            all.Add(new TaskDTO(Id: task.Id, Title: task.Title!, AssignedToName: (context.Users.Find(task.UserID)!.Name!), Tags: tags, State: task.State));
-        }
-        if (all == null) return null!;
-        else return all;
+        return Tasks.ToList();
     }
 
     public IReadOnlyCollection<TaskDTO> ReadRemoved()
     {
-        var all = new List<TaskDTO>();
-        foreach (var task in context.Tasks)
-        {
-            var tags = new List<String>();
-            foreach (var tag in task.Tags) tags.Add(tag.ToString()!);
+        var Tasks = from c in _context.Tasks
+            let tags = c.Tags.Select(p => p.Name).ToList()
+            where c.State == State.Removed == true
+            select new TaskDTO(c.Id, c.Title, c.AssignedTo.Name, tags, c.State);
 
-            if (task.State == State.Removed) all.Add(new TaskDTO(Id: task.Id, Title: task.Title!, AssignedToName: (context.Users.Find(task.UserID)!.Name!), Tags: tags, State: task.State));
-        }
-        if (all == null) return null!;
-        else return all;
+        return Tasks.ToList();
     }
 
     public IReadOnlyCollection<TaskDTO> ReadByTag(string tag)
     {
-        var all = new List<TaskDTO>();
-        foreach (var task in context.Tasks)
-        {
-            var tags = new List<String>();
-            foreach (var t in task.Tags)
-            {
-                tags.Add(tag.ToString());
-                if (t.ToString() == tag) all.Add(new TaskDTO(Id: task.Id, Title: task.Title!, AssignedToName: (context.Users.Find(task.UserID)!.Name!), Tags: tags, State: task.State));
-            }
-        }
-        if (all == null) return null!;
-        else return all;
+        var Tasks = from c in _context.Tasks
+            let tags = c.Tags.Select(p => p.Name).ToList()
+            where tags.Contains(tag)
+            select new TaskDTO(c.Id, c.Title, c.AssignedTo.Name, tags, c.State);
+
+        return Tasks.ToList();
     }
 
     public IReadOnlyCollection<TaskDTO> ReadByUser(int userId)
     {
-        var all = new List<TaskDTO>();
-        foreach (var task in context.Tasks)
-        {
-            var tags = new List<String>();
-            foreach (var tag in task.Tags) tags.Add(tag.ToString()!);
-            if (task.UserID == userId) all.Add(new TaskDTO(Id: task.Id, Title: task.Title!, AssignedToName: (context.Users.Find(task.UserID)!.Name!), Tags: tags, State: task.State));
+        var Tasks = from c in _context.Tasks
+            let tags = c.Tags.Select(p => p.Name).ToList()
+            where c.UserID == userId
+            select new TaskDTO(c.Id, c.Title, c.AssignedTo.Name, tags, c.State);
 
-        }
-        if (all == null) return null!;
-        else return all;
+        return Tasks.ToList();
     }
 
     public IReadOnlyCollection<TaskDTO> ReadByState(State state)
     {
-        var all = new List<TaskDTO>();
-        foreach (var task in context.Tasks)
-        {
-            var tags = new List<String>();
-            foreach (var tag in task.Tags) tags.Add(tag.ToString()!);
-            if (task.State == state) all.Add(new TaskDTO(Id: task.Id, Title: task.Title!, AssignedToName: (context.Users.Find(task.UserID)!.Name!), Tags: tags, State: task.State));
-        }
-        if (all == null) return null!;
-        else return all;
+        var Tasks = from c in _context.Tasks
+            let tags = c.Tags.Select(p => p.Name).ToList()
+            where c.State == state
+            select new TaskDTO(c.Id, c.Title, c.AssignedTo.Name, tags, c.State);
+        return Tasks.ToList();
     }
+
     public Response Update(TaskUpdateDTO task)
-        {
-            try
-            {
-                var newTask = context.Tasks.Where(t => t.Id == task.Id).First();
-                if (newTask.State != task.State)
-                {
-                    newTask.State = task.State;
-                    newTask.StateUpdated = DateTime.Now;
-                }
-                if (context.Users.Find(task.AssignedToId) == null) return Response.BadRequest;
-                else
-                {
-                    if (task.Tags != null) newTask.Tags = (List<Tag>)task.Tags;
+    {
+        var entity = _context.Tasks.Find(task.Id);
 
-                    newTask.Description = task.Description;
-                    newTask.Title = task.Title;
-                    newTask.UserID = task.AssignedToId;
-                    context.Tasks.Update(newTask);
-                    context.SaveChanges();
-                    return Response.Updated;
-                }
-            }
-            catch
-            {
-                return Response.NotFound;
-            }
+        if (entity == null)
+        {
+            return NotFound;
         }
 
-        public Response Delete(int taskId)
-        {
-            try
-            {
-                var newTask = context.Tasks.Where(t => t.Id == taskId).First();
-                if (newTask!.State == State.New)
-                {
-                    context.Remove(newTask!);
-                    context.SaveChanges();
-                    return Response.Deleted;
-                }
-                else if (newTask!.State == State.Active)
-                {
-                    newTask.State = State.Removed;
-                    return Response.Conflict;
-                }
-                else return Response.Conflict;
+        entity.Title = task.Title;
+        entity.Description = task.Description;
+        entity.AssignedTo = CreateOrUpdateUser(task.AssignedToId);
+        entity.StateUpdated = DateTime.Now;
+        entity.State = State.New;
+        entity.Tags = CreateOrUpdateTags(task.Tags).ToList();
 
-            }
-            catch
-            {
-                return Response.NotFound;
-            }
+        _context.SaveChanges();
+
+        return Updated;
+    }
+
+    public Response Delete(int taskId)
+    {
+        var entity = _context.Tasks.Find(taskId);
+
+        if (entity == null)
+        {
+            return NotFound;
+        }
+
+        _context.Tasks.Remove(entity);
+        _context.SaveChanges();
+
+        return Deleted;
+    }
+
+    private User? CreateOrUpdateUser(int? userId) =>
+        userId is null ? null : _context.Users.Find(userId) ?? new User("NewUser");
+
+    private IEnumerable<Tag> CreateOrUpdateTags(IEnumerable<string> tagNames)
+    {
+        var existing = _context.Tags.Where(p => tagNames.Contains(p.Name)).ToDictionary(p => p.Name);
+
+        foreach (var tagName in tagNames)
+        {
+            existing.TryGetValue(tagName, out var tag);
+
+            yield return tag ?? new Tag(tagName);
         }
     }
+}

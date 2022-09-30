@@ -9,7 +9,7 @@ public class TagRepository : ITagRepository
 
     public TagRepository(KanbanContext context)
     {
-        this._context = context;
+        _context = context;
     }
 
     public (Response Response, int TagId) Create(TagCreateDTO tag)

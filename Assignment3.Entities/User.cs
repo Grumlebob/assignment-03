@@ -10,8 +10,9 @@ Email : string(100), required, unique
 Tasks : list of Task entities belonging to User
  */
 {
-    public User()
+    public User(string name)
     {
+        Name = name;
         Tasks = new List<Task>();
     }
 

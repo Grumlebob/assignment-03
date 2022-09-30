@@ -1,85 +1,107 @@
 ﻿using Assignment3.Core;
+using static Assignment3.Core.Response;
 
 namespace Assignment3.Entities;
 
 public class UserRepository : IUserRepository
 {
 
-    private readonly KanbanContext context;
+    private readonly KanbanContext _context;
 
     public UserRepository(KanbanContext context)
     {
-        this.context = context;
+        _context = context;
     }
 
     public (Response Response, int UserId) Create(UserCreateDTO user)
     {
-        var newUser = new User();
-        newUser.Name = user.Name;
-        var id = 0;
-        try{
-            id = context.Users.Where(x => x.Email == user.Email).First().Id;
-        }catch{
+        var entity = _context.Users.FirstOrDefault(c => c.Name == user.Name);
+        Response response;
 
+        if (entity is null)
+        {
+            entity = new User(user.Name);
+
+            _context.Users.Add(entity);
+            _context.SaveChanges();
+
+            response = Created;
         }
-            if(context.Users.Find(id) != null) return (Response.Conflict, 00);
-            else{
-                newUser.Email = user.Email;
-            }
-            context.Users.Add(newUser);
-            context.SaveChanges();
-            return (Response.Created, newUser.Id);
+        else
+        {
+            response = Conflict;
         }
+
+        var created = new UserDTO(entity.Id, entity.Name, entity.Email);
+
+        return (response, created.Id);
+    }
 
     public UserDTO Find(int userId)
     {
-        var u = context.Users.Find(userId);
-        return new UserDTO(u.Id, u.Name, u.Email);
+        var user = from c in _context.Users
+            where c.Id == userId
+            select new UserDTO(c.Id, c.Name,c.Email);
+
+        return user.FirstOrDefault()!;
     }
     
 
 
     public IReadOnlyCollection<UserDTO> Read()
     {
-        var all = new List<UserDTO>();
-        foreach (var tag in context.Users)
-        {
-            all.Add(new UserDTO(tag.Id, tag.Name, tag.Email));
-        }
-        return all;
+        var cities = from c in _context.Users
+            orderby c.Id
+            select new UserDTO(c.Id, c.Name,c.Email);
+
+        return cities.ToArray();
     }
 
     public Response Update(UserUpdateDTO user)
     {
-        try
+        var entity = _context.Users.Find(user.Id);
+        Response status;
+
+        if (entity is null)
         {
-            var newUser = context.Users.Where(u => u.Id == user.Id).First();
-            newUser.Email = user.Email;
-            newUser.Name = user.Name;
-            context.Users.Update(newUser);
-            context.SaveChanges();
-            return Response.Updated;
+            status = NotFound;
         }
-        catch
+        else
         {
-            return Response.NotFound;
+            entity.Name = user.Name;
+            _context.SaveChanges();
+            status = Updated;
         }
+
+        return status;
     }
 
     public Response Delete(int userId, bool force = false)
     {
-        if (context.Users.Find(userId)!.Tasks != null && !force) return Response.Conflict;
-        else{
-        try{
-            var newUser = context.Users.Where(u => u.Id == userId).First();
-            context.Users.Remove(newUser);
-            context.SaveChanges();
-            return Response.Deleted;
-        }
-        catch
+        var user = _context.Users.FirstOrDefault(c => c.Id == userId);
+        Response status;
+
+        if (user is null)
         {
-            return Response.NotFound;
+            status = NotFound;
         }
+        else if (!force)
+        {
+            status = Conflict;
         }
+
+        else if (user.Tasks.Any())
+        {
+            status = Conflict;
+        }
+        else
+        {
+            _context.Users.Remove(user);
+            _context.SaveChanges();
+
+            status = Deleted;
+        }
+
+        return status;
     }
 }
