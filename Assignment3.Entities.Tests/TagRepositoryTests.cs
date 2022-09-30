@@ -8,6 +8,7 @@ public sealed class TagRepositoryTests : IDisposable
 {
     private readonly KanbanContext _context;
     private readonly TagRepository _repository;
+    private readonly SqliteConnection _connection;
 
     public TagRepositoryTests()
     {
@@ -19,6 +20,7 @@ public sealed class TagRepositoryTests : IDisposable
         context.Database.EnsureCreated();
         context.SaveChanges();
 
+        _connection = connection;
         _context = context;
         _repository = new TagRepository(_context);
     }
@@ -61,5 +63,6 @@ public sealed class TagRepositoryTests : IDisposable
     public void Dispose()
     {
         _context.Dispose();
+        //_connection.Dispose();
     }
 }

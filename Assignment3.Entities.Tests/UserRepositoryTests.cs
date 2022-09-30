@@ -7,6 +7,7 @@ public sealed class UserRepositoryTests : IDisposable
 {
     private readonly KanbanContext _context;
     private readonly UserRepository _repository;
+    private readonly SqliteConnection _connection;
 
     public UserRepositoryTests()
     {
@@ -50,5 +51,6 @@ public sealed class UserRepositoryTests : IDisposable
     public void Dispose()
     {
         _context.Dispose();
+        //_connection.Dispose();
     }
 }

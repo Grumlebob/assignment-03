@@ -10,26 +10,43 @@ public class TagRepository : ITagRepository
     {
         this.context = context;
     }
+
     public (Response Response, int TagId) Create(TagCreateDTO tag)
     {
-
         var newTag = new Tag();
-        
-            newTag.Name = tag.Name;
-            var id = 0;
-            try{    
-            id = context.Tags.First(x => x.Name == tag.Name).Id;
-            }
-            catch
-            {
-            }
 
-            if (context.Tags.Find(id) != null) return (Response.Conflict, newTag.Id);
-            else{
+        newTag.Name = tag.Name;
+        var id = 0;
+        try
+        {
+            id = context.Tags.First(x => x.Name == tag.Name).Id;
+        }
+        catch
+        {
+        }
+
+        if (context.Tags.Find(id) != null) return (Response.Conflict, newTag.Id);
+        else
+        {
             context.Tags.Add(newTag);
             context.SaveChanges();
             return (Response.Created, newTag.Id);
-            }
+        }
+    }
+    
+    public (Response Response, int TagId) CreateLærens(TagCreateDTO tag)
+    {
+        var newTag = new Tag();
+        newTag.Name = tag.Name;
+        var entity = context.Tags.FirstOrDefault(t => t.Name == tag.Name);
+        
+        if (entity is not null) return (Response.Conflict, 0);
+        else
+        {
+            context.Tags.Add(newTag);
+            context.SaveChanges();
+            return (Response.Created, newTag.Id);
+        }
     }
 
     public IReadOnlyCollection<TagDTO> ReadAll()
@@ -38,16 +55,16 @@ public class TagRepository : ITagRepository
         foreach (var tag in context.Tags)
         {
             all.Add(new TagDTO(Id: tag.Id, Name: tag.Name));
-            
         }
+
         return all;
     }
 
     public TagDTO Read(int tagId)
     {
-         var tag = context.Tags.Find(tagId);
-            if (tag == null) return null;
-            return new TagDTO(tag.Id, tag.Name);
+        var tag = context.Tags.Find(tagId);
+        if (tag == null) return null;
+        return new TagDTO(tag.Id, tag.Name);
     }
 
     public Response Update(TagUpdateDTO tag)
