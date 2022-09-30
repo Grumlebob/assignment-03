@@ -40,7 +40,21 @@ public class TaskRepository : ITaskRepository
 
     }
 
-    public IReadOnlyCollection<TaskDTO> ReadAll()
+    public TaskDetailsDTO Find(int taskId)
+    {
+        foreach (var task in context.Tasks)
+        {
+            var tags = new List<String>();
+            foreach (var tag in task.Tags) tags.Add(tag.ToString()!);
+            if (task.Id == taskId)
+            {
+                return new TaskDetailsDTO(Id: task.Id, Title: task.Title!, Description: task.Description!, Created: task.StateUpdated, AssignedToName: (context.Users.Find(task.UserID)!.Name)!, Tags: tags, State: task.State, task.StateUpdated);
+            }
+        }return null!;
+    }
+    
+
+    public IReadOnlyCollection<TaskDTO> Read()
     {
         var all = new List<TaskDTO>();
 
@@ -55,7 +69,7 @@ public class TaskRepository : ITaskRepository
         else return all;
     }
 
-    public IReadOnlyCollection<TaskDTO> ReadAllRemoved()
+    public IReadOnlyCollection<TaskDTO> ReadRemoved()
     {
         var all = new List<TaskDTO>();
         foreach (var task in context.Tasks)
@@ -69,7 +83,7 @@ public class TaskRepository : ITaskRepository
         else return all;
     }
 
-    public IReadOnlyCollection<TaskDTO> ReadAllByTag(string tag)
+    public IReadOnlyCollection<TaskDTO> ReadByTag(string tag)
     {
         var all = new List<TaskDTO>();
         foreach (var task in context.Tasks)
@@ -85,7 +99,7 @@ public class TaskRepository : ITaskRepository
         else return all;
     }
 
-    public IReadOnlyCollection<TaskDTO> ReadAllByUser(int userId)
+    public IReadOnlyCollection<TaskDTO> ReadByUser(int userId)
     {
         var all = new List<TaskDTO>();
         foreach (var task in context.Tasks)
@@ -99,7 +113,7 @@ public class TaskRepository : ITaskRepository
         else return all;
     }
 
-    public IReadOnlyCollection<TaskDTO> ReadAllByState(State state)
+    public IReadOnlyCollection<TaskDTO> ReadByState(State state)
     {
         var all = new List<TaskDTO>();
         foreach (var task in context.Tasks)
@@ -111,20 +125,7 @@ public class TaskRepository : ITaskRepository
         if (all == null) return null!;
         else return all;
     }
-
-    public TaskDetailsDTO Read(int taskId)
-    {
-        foreach (var task in context.Tasks)
-        {
-            var tags = new List<String>();
-            foreach (var tag in task.Tags) tags.Add(tag.ToString()!);
-            if (task.Id == taskId)
-            {
-                return new TaskDetailsDTO(Id: task.Id, Title: task.Title!, Description: task.Description!, Created: task.StateUpdated, AssignedToName: (context.Users.Find(task.UserID)!.Name)!, Tags: tags, State: task.State, task.StateUpdated);
-            }
-        }return null!;
-    }
-        public Response Update(TaskUpdateDTO task)
+    public Response Update(TaskUpdateDTO task)
         {
             try
             {

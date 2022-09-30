@@ -33,7 +33,29 @@ public class TagRepository : ITagRepository
             return (Response.Created, newTag.Id);
         }
     }
-    
+
+    public TagDTO Find(int tagId)
+    {
+        var tag = context.Tags.Find(tagId);
+        if (tag == null) return null;
+        else
+        {
+            var tagDTO = new TagDTO(Id: tag.Id, Name: tag.Name);
+            return tagDTO;
+        }
+    }
+
+    public IReadOnlyCollection<TagDTO> Read()
+    {
+        var all = new List<TagDTO>();
+        foreach (var tag in context.Tags)
+        {
+            all.Add(new TagDTO(Id: tag.Id, Name: tag.Name));
+        }
+
+        return all;
+    }
+
     public (Response Response, int TagId) CreateLærens(TagCreateDTO tag)
     {
         var newTag = new Tag();
@@ -48,24 +70,7 @@ public class TagRepository : ITagRepository
             return (Response.Created, newTag.Id);
         }
     }
-
-    public IReadOnlyCollection<TagDTO> ReadAll()
-    {
-        var all = new List<TagDTO>();
-        foreach (var tag in context.Tags)
-        {
-            all.Add(new TagDTO(Id: tag.Id, Name: tag.Name));
-        }
-
-        return all;
-    }
-
-    public TagDTO Read(int tagId)
-    {
-        var tag = context.Tags.Find(tagId);
-        if (tag == null) return null;
-        return new TagDTO(tag.Id, tag.Name);
-    }
+    
 
     public Response Update(TagUpdateDTO tag)
     {

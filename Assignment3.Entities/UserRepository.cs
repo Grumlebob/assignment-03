@@ -30,9 +30,16 @@ public class UserRepository : IUserRepository
             context.SaveChanges();
             return (Response.Created, newUser.Id);
         }
+
+    public UserDTO Find(int userId)
+    {
+        var u = context.Users.Find(userId);
+        return new UserDTO(u.Id, u.Name, u.Email);
+    }
     
 
-    public IReadOnlyCollection<UserDTO> ReadAll()
+
+    public IReadOnlyCollection<UserDTO> Read()
     {
         var all = new List<UserDTO>();
         foreach (var tag in context.Users)
@@ -40,12 +47,6 @@ public class UserRepository : IUserRepository
             all.Add(new UserDTO(tag.Id, tag.Name, tag.Email));
         }
         return all;
-    }
-
-    public UserDTO Read(int userId)
-    {
-        var u = context.Users.Find(userId);
-        return new UserDTO(u.Id, u.Name, u.Email);
     }
 
     public Response Update(UserUpdateDTO user)
