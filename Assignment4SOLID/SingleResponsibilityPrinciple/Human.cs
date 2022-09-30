@@ -27,5 +27,5 @@ public class Human
     {
         
     }
-    //...And a multiple of several other responsibilities
+    //...And a multiple of several other responsibilities.
 }
