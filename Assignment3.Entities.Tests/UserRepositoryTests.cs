@@ -19,6 +19,7 @@ public sealed class UserRepositoryTests : IDisposable
         context.Database.EnsureCreated();
         context.SaveChanges();
 
+        _connection = connection;
         _context = context;
         _repository = new UserRepository(_context);
     }
@@ -51,6 +52,6 @@ public sealed class UserRepositoryTests : IDisposable
     public void Dispose()
     {
         _context.Dispose();
-        //_connection.Dispose();
+        _connection.Dispose();
     }
 }

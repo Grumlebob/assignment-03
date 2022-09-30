@@ -20,6 +20,7 @@ public sealed class TaskRepositoryTests : IDisposable
         context.Database.EnsureCreated();
         context.SaveChanges();
 
+        _connection = connection;
         _context = context;
         _repository = new TaskRepository(_context);
     }
@@ -82,7 +83,7 @@ public sealed class TaskRepositoryTests : IDisposable
     public void Dispose()
     {
         _context.Dispose();
-        //_connection.Dispose();
+        _connection.Dispose();
     }
 }
 

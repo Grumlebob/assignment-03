@@ -4,8 +4,9 @@ namespace Assignment3.Entities;
 
 public class Tag
 {
-    public Tag()
+    public Tag(string name)
     {
+        Name = name;
         Tasks = new List<Task>();
     }
     //Id : int

@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assignment3.Entities", "Ass
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assignment3.Entities.Tests", "Assignment3.Entities.Tests\Assignment3.Entities.Tests.csproj", "{9861D336-585F-4926-A3D0-785D2B89B122}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assignment4SOLID", "Assignment4SOLID\Assignment4SOLID.csproj", "{7ABE6C61-6DEF-4CD9-B492-12A713A27905}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{9861D336-585F-4926-A3D0-785D2B89B122}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9861D336-585F-4926-A3D0-785D2B89B122}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9861D336-585F-4926-A3D0-785D2B89B122}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7ABE6C61-6DEF-4CD9-B492-12A713A27905}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7ABE6C61-6DEF-4CD9-B492-12A713A27905}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7ABE6C61-6DEF-4CD9-B492-12A713A27905}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7ABE6C61-6DEF-4CD9-B492-12A713A27905}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

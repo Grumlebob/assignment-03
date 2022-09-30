@@ -1,109 +1,104 @@
 ﻿using Assignment3.Core;
+using static Assignment3.Core.Response;
 
 namespace Assignment3.Entities;
 
 public class TagRepository : ITagRepository
 {
-    private readonly KanbanContext context;
+    private readonly KanbanContext _context;
 
     public TagRepository(KanbanContext context)
     {
-        this.context = context;
+        this._context = context;
     }
 
     public (Response Response, int TagId) Create(TagCreateDTO tag)
     {
-        var newTag = new Tag();
+        var entity = _context.Tags.FirstOrDefault(c => c.Name == tag.Name);
+        Response response;
 
-        newTag.Name = tag.Name;
-        var id = 0;
-        try
+        if (entity is null)
         {
-            id = context.Tags.First(x => x.Name == tag.Name).Id;
-        }
-        catch
-        {
-        }
+            entity = new Tag(tag.Name);
 
-        if (context.Tags.Find(id) != null) return (Response.Conflict, newTag.Id);
+            _context.Tags.Add(entity);
+            _context.SaveChanges();
+
+            response = Created;
+        }
         else
         {
-            context.Tags.Add(newTag);
-            context.SaveChanges();
-            return (Response.Created, newTag.Id);
+            response = Conflict;
         }
+
+        var created = new TagDTO(entity.Id, entity.Name);
+
+        return (response, created.Id);
     }
 
     public TagDTO Find(int tagId)
     {
-        var tag = context.Tags.Find(tagId);
-        if (tag == null) return null;
-        else
-        {
-            var tagDTO = new TagDTO(Id: tag.Id, Name: tag.Name);
-            return tagDTO;
-        }
+        var tag = from c in _context.Tags
+            where c.Id == tagId
+            select new TagDTO(c.Id, c.Name);
+
+        return tag.FirstOrDefault()!;
     }
 
     public IReadOnlyCollection<TagDTO> Read()
     {
-        var all = new List<TagDTO>();
-        foreach (var tag in context.Tags)
-        {
-            all.Add(new TagDTO(Id: tag.Id, Name: tag.Name));
-        }
+        var cities = from c in _context.Tags
+            orderby c.Id
+            select new TagDTO(c.Id, c.Name);
 
-        return all;
-    }
-
-    public (Response Response, int TagId) CreateLærens(TagCreateDTO tag)
-    {
-        var newTag = new Tag();
-        newTag.Name = tag.Name;
-        var entity = context.Tags.FirstOrDefault(t => t.Name == tag.Name);
-        
-        if (entity is not null) return (Response.Conflict, 0);
-        else
-        {
-            context.Tags.Add(newTag);
-            context.SaveChanges();
-            return (Response.Created, newTag.Id);
-        }
+        return cities.ToArray();
     }
     
-
     public Response Update(TagUpdateDTO tag)
     {
-        try
+        var entity = _context.Tags.Find(tag.Id);
+        Response status;
+
+        if (entity is null)
         {
-            var newTag = context.Tags.Where(t => t.Id == tag.Id).First();
-            newTag.Name = tag.Name;
-            context.Tags.Update(newTag);
-            context.SaveChanges();
-            return Response.Updated;
+            status = NotFound;
         }
-        catch
+        else
         {
-            return Response.NotFound;
+            entity.Name = tag.Name;
+            _context.SaveChanges();
+            status = Updated;
         }
+
+        return status;
     }
 
-    public Response Delete(int tagId, bool force = false)
+    public Response Delete(int tagId, bool force)
     {
-        try
+        var tag = _context.Tags.FirstOrDefault(c => c.Id == tagId);
+        Response status;
+
+        if (tag is null)
         {
-            if (context.Tags.Find(tagId)!.Tasks != null && !force) return Response.Conflict;
-            else
-            {
-                var newTag = context.Tags.Where(t => t.Id == tagId).First();
-                context.Remove(newTag);
-                context.SaveChanges();
-                return Response.Deleted;
-            }
+            status = NotFound;
         }
-        catch
+        else if (!force)
         {
-            return Response.NotFound;
+            status = Conflict;
         }
+
+        else if (tag.Tasks.Any())
+        {
+            status = Conflict;
+        }
+        else
+        {
+            _context.Tags.Remove(tag);
+            _context.SaveChanges();
+
+            status = Deleted;
+        }
+
+        return status;
     }
 }
